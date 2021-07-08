@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <Console name="CustomConsole" target="SYSTEM_OUT">
+            <!-- Layout doc https://logging.apache.org/log4j/2.x/manual/layouts.html -->
+            <PatternLayout pattern="%date{HH:mm:ss.SSS} %-5level %class{1}: %message%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="ik" level="debug" additivity="false">
+            <AppenderRef ref="CustomConsole"/>
+        </Logger>
+        <Root level="error">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
