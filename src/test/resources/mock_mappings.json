@@ -1,0 +1,87 @@
+{
+  "mappings" : [ {
+    "id" : "d6806214-d40c-4e3f-b6af-f84351fe199b",
+    "request" : {
+      "url" : "/plaintext/mapping1",
+      "method" : "GET"
+    },
+    "response" : {
+      "status" : 200,
+      "body" : "1RWrR6u6pZYXwAjPuELi6HQZcO3x3MsDgwAq3pIG47odDGjIly6jzlWKHYmV7Oa6dNzMkp4soydI502eydy0OhtRHDaNJhOhS64F",
+      "headers" : {
+        "Content-Type" : "text/plain"
+      }
+    },
+    "uuid" : "d6806214-d40c-4e3f-b6af-f84351fe199b"
+  }, {
+    "id" : "2be0de1f-9ab2-4f93-9fb7-e60a8350134f",
+    "request" : {
+      "urlPathPattern" : "/jsontext/mapping2*",
+      "method" : "GET",
+      "queryParameters" : {
+        "testqueryparam" : {
+          "equalTo" : "*"
+        }
+      }
+    },
+    "response" : {
+      "status" : 200,
+      "body" : "{ a: \"a\", b: \"b\" }",
+      "headers" : {
+        "Content-Type" : "application/json"
+      }
+    },
+    "uuid" : "2be0de1f-9ab2-4f93-9fb7-e60a8350134f"
+  }, {
+    "id" : "a83f19d3-76da-4328-99ae-348263f95ff8",
+    "request" : {
+      "urlPathPattern" : "/*",
+      "method" : "PUT"
+    },
+    "response" : {
+      "status" : 301,
+      "headers" : {
+        "Location" : "/plaintext/mapping1"
+      },
+      "fixedDelayMilliseconds" : 10000
+    },
+    "uuid" : "a83f19d3-76da-4328-99ae-348263f95ff8"
+  }, {
+    "id" : "7fcb4888-ba81-442b-b7ef-d578f4ec52db",
+    "request" : {
+      "url" : "/jsontext/mapping3",
+      "method" : "POST",
+      "headers" : {
+        "CustomType" : {
+          "equalTo" : "CustomValue"
+        }
+      },
+      "bodyPatterns" : [ {
+        "contains" : "TestValue1"
+      } ]
+    },
+    "response" : {
+      "status" : 500,
+      "body" : "8ERsZq7tkiVsABIp1qY5",
+      "headers" : {
+        "Content-Type" : "text/plain"
+      }
+    },
+    "uuid" : "7fcb4888-ba81-442b-b7ef-d578f4ec52db",
+    "priority" : 10
+  }, {
+    "id" : "570950ac-014a-412c-a745-5e08c4fd2e16",
+    "request" : {
+      "url" : "/jsontext/mapping3",
+      "method" : "POST"
+    },
+    "response" : {
+      "status" : 404
+    },
+    "uuid" : "570950ac-014a-412c-a745-5e08c4fd2e16",
+    "priority" : 20
+  } ],
+  "meta" : {
+    "total" : 5
+  }
+}
