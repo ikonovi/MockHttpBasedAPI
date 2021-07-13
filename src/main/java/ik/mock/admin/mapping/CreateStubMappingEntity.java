@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CreateStubMappingEntity {
-    Request request;
-    Response response;
-    Integer priority;
+    private Request request;
+    private Response response;
+    private Integer priority;
 }

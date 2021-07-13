@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class TestQueryParam {
-    String equalTo;
+    private String equalTo;
 }

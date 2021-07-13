@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class CustomType {
-    String equalTo;
+    private String equalTo;
 }
