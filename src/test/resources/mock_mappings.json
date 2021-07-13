@@ -1,87 +1,96 @@
 {
-  "mappings" : [ {
-    "id" : "d6806214-d40c-4e3f-b6af-f84351fe199b",
-    "request" : {
-      "url" : "/plaintext/mapping1",
-      "method" : "GET"
-    },
-    "response" : {
-      "status" : 200,
-      "body" : "1RWrR6u6pZYXwAjPuELi6HQZcO3x3MsDgwAq3pIG47odDGjIly6jzlWKHYmV7Oa6dNzMkp4soydI502eydy0OhtRHDaNJhOhS64F",
-      "headers" : {
-        "Content-Type" : "text/plain"
-      }
-    },
-    "uuid" : "d6806214-d40c-4e3f-b6af-f84351fe199b"
-  }, {
-    "id" : "2be0de1f-9ab2-4f93-9fb7-e60a8350134f",
-    "request" : {
-      "urlPathPattern" : "/jsontext/mapping2*",
-      "method" : "GET",
-      "queryParameters" : {
-        "testqueryparam" : {
-          "equalTo" : "*"
-        }
-      }
-    },
-    "response" : {
-      "status" : 200,
-      "body" : "{ a: \"a\", b: \"b\" }",
-      "headers" : {
-        "Content-Type" : "application/json"
-      }
-    },
-    "uuid" : "2be0de1f-9ab2-4f93-9fb7-e60a8350134f"
-  }, {
-    "id" : "a83f19d3-76da-4328-99ae-348263f95ff8",
-    "request" : {
-      "urlPathPattern" : "/*",
-      "method" : "PUT"
-    },
-    "response" : {
-      "status" : 301,
-      "headers" : {
-        "Location" : "/plaintext/mapping1"
+  "mappings": [
+    {
+      "id": "09009aad-bc6e-46b3-ad9f-58f90919e2df",
+      "request": {
+        "url": "/plaintext/mapping1",
+        "method": "GET"
       },
-      "fixedDelayMilliseconds" : 10000
-    },
-    "uuid" : "a83f19d3-76da-4328-99ae-348263f95ff8"
-  }, {
-    "id" : "7fcb4888-ba81-442b-b7ef-d578f4ec52db",
-    "request" : {
-      "url" : "/jsontext/mapping3",
-      "method" : "POST",
-      "headers" : {
-        "CustomType" : {
-          "equalTo" : "CustomValue"
+      "response": {
+        "status": 200,
+        "body": "SozuJIoVgKgL5XEX5KCfd1qTHCbgpMKFXZbN3VPrn1swDXPLQIc4kY5ywo3Ym91oEK5ZsFdMsZIcBmh8l4nG90eFojyS7UssfHP6",
+        "headers": {
+          "Content-Type": "text/plain",
+          "MyHeader": "myHeader"
         }
       },
-      "bodyPatterns" : [ {
-        "contains" : "TestValue1"
-      } ]
+      "uuid": "09009aad-bc6e-46b3-ad9f-58f90919e2df"
     },
-    "response" : {
-      "status" : 500,
-      "body" : "8ERsZq7tkiVsABIp1qY5",
-      "headers" : {
-        "Content-Type" : "text/plain"
-      }
+    {
+      "id": "9e5cf2cc-a956-4f3f-b67f-01cee6c22d9d",
+      "request": {
+        "urlPathPattern": "/jsontext/mapping2*",
+        "method": "GET",
+        "queryParameters": {
+          "testqueryparam": {
+            "equalTo": "*"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": "{ a: 'a', b: 'b' }",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "uuid": "9e5cf2cc-a956-4f3f-b67f-01cee6c22d9d"
     },
-    "uuid" : "7fcb4888-ba81-442b-b7ef-d578f4ec52db",
-    "priority" : 10
-  }, {
-    "id" : "570950ac-014a-412c-a745-5e08c4fd2e16",
-    "request" : {
-      "url" : "/jsontext/mapping3",
-      "method" : "POST"
+    {
+      "id": "84ce039f-1185-4999-bd47-4496bb5a7a92",
+      "request": {
+        "url": "/jsontext/mapping3",
+        "method": "POST",
+        "headers": {
+          "CustomType": {
+            "equalTo": "CustomValue"
+          }
+        },
+        "bodyPatterns": [
+          {
+            "contains": "TestValue1"
+          }
+        ]
+      },
+      "response": {
+        "status": 500,
+        "body": "uprHJp7VlqcO5N8s5bm6",
+        "headers": {
+          "Content-Type": "text/plain"
+        }
+      },
+      "uuid": "84ce039f-1185-4999-bd47-4496bb5a7a92",
+      "priority": 10
     },
-    "response" : {
-      "status" : 404
+    {
+      "id": "1cbc71f2-990f-43ac-b9a4-0daff6062d5f",
+      "request": {
+        "url": "/jsontext/mapping3",
+        "method": "POST"
+      },
+      "response": {
+        "status": 404
+      },
+      "uuid": "1cbc71f2-990f-43ac-b9a4-0daff6062d5f",
+      "priority": 20
     },
-    "uuid" : "570950ac-014a-412c-a745-5e08c4fd2e16",
-    "priority" : 20
-  } ],
-  "meta" : {
-    "total" : 5
+    {
+      "id": "9da61f0b-951e-4ea5-8ddc-d0f7ed47040d",
+      "request": {
+        "urlPathPattern": "/*",
+        "method": "PUT"
+      },
+      "response": {
+        "status": 303,
+        "headers": {
+          "Location": "/plaintext/mapping1"
+        },
+        "fixedDelayMilliseconds": 10000
+      },
+      "uuid": "9da61f0b-951e-4ea5-8ddc-d0f7ed47040d"
+    }
+  ],
+  "meta": {
+    "total": 5
   }
 }
