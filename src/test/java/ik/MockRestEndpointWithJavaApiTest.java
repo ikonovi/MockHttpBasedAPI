@@ -3,12 +3,13 @@ package ik;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import ik.util.random.RandomGenerator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.restassured.RestAssured;
+import lombok.extern.log4j.Log4j2;
 import org.hamcrest.CoreMatchers;
-import org.testng.annotations.*;
 import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -16,63 +17,67 @@ import java.util.concurrent.TimeUnit;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
+import static io.restassured.config.RedirectConfig.redirectConfig;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
+@Log4j2
 public class MockRestEndpointWithJavaApiTest {
+    private WireMockServer mock;
+    // Test data
+    private final RandomGenerator randomGenerator = new RandomGenerator();
+    private String randomString1;
+    private String randomString2;
+    private final String mock2RequestBody = "{ a: 'a', b: 'b' }";
+    private int mock4ResponseDelaySeconds;
 
-    private static final Logger log = LogManager.getLogger(MockRestEndpointWithJavaApiTest.class);
-    String mock2RequestBody = "{ a: \"a\", b: \"b\" }";
-    RandomGenerator randomGenerator = new RandomGenerator();
-    String randomString1 = randomGenerator.randomAlphanumeric(100);
-    WireMockServer mock;
-
-    @BeforeClass
+    @BeforeTest
     public void setupWireMockServer() {
         WireMockConfiguration wireMockConfiguration = new WireMockConfiguration();
         mock = new WireMockServer(wireMockConfiguration);
         mock.start();
     }
 
-    @BeforeMethod
+    @BeforeClass
     public void setupMock1() {
-        // Mock #1
+        randomString1 = randomGenerator.randomAlphanumeric(100);
         mock.stubFor(
             get("/plaintext/mapping1")
-                    .willReturn(aResponse()
-                            .withStatus(200)
-                            .withBody(randomString1)
-                            .withHeader("Content-Type", "text/plain")
-                            .withHeader("MyHeader", "myHeader")
-                    )
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    .withBody(randomString1)
+                    .withHeader("Content-Type", "text/plain")
+                    .withHeader("MyHeader", "myHeader")
+                )
         );
     }
 
-    @BeforeMethod
+    @BeforeClass
     public void setupMock2() {
         // Mock #2
         mock.stubFor(
             get(urlPathMatching("/jsontext/mapping2*"))
-                    .withQueryParam("testqueryparam", equalTo("*"))
-                    .willReturn(aResponse()
-                            .withStatus(200)
-                            .withBody(mock2RequestBody)
-                            .withHeader("Content-Type", "application/json")
-                    )
+                .withQueryParam("testqueryparam", equalTo("*"))
+                .willReturn(aResponse()
+                    .withStatus(200)
+                    .withBody(mock2RequestBody)
+                    .withHeader("Content-Type", "application/json")
+                )
         );
     }
 
-    @BeforeMethod
+    @BeforeClass
     public void setupMock3() {
-        String randomString = randomGenerator.randomAlphanumeric(20);
+        randomString2 = randomGenerator.randomAlphanumeric(20);
         mock.stubFor(
             post("/jsontext/mapping3")
                 .atPriority(10)
                 .withHeader("CustomType", equalTo("CustomValue"))
                 .withRequestBody(containing("TestValue1"))
-                .willReturn(serverError()
-                    .withStatus(500)
-                    .withBody(randomString)
-                    .withHeader("Content-Type", "text/plain")
-                )
+            .willReturn(serverError()
+                .withStatus(500)
+                .withHeader("Content-Type", "text/plain")
+                .withBody(randomString2)
+            )
         );
         mock.stubFor(
             post("/jsontext/mapping3")
@@ -83,16 +88,17 @@ public class MockRestEndpointWithJavaApiTest {
         );
     }
 
-    @BeforeMethod
+    @BeforeClass
     public void setupMock4() {
-        int delaySeconds = 10;
+        mock4ResponseDelaySeconds = 10;
         mock.stubFor(
             put(urlPathMatching("/*"))
-                .willReturn(permanentRedirect("/plaintext/mapping1")
-                        .withFixedDelay((int) TimeUnit.SECONDS.toMillis(delaySeconds))
+                .willReturn(
+                        temporaryRedirect("/plaintext/mapping1")
+                        .withStatus(303)
+                        .withFixedDelay((int) TimeUnit.SECONDS.toMillis(mock4ResponseDelaySeconds))
                 )
         );
-
     }
 
     @Test
@@ -113,25 +119,69 @@ public class MockRestEndpointWithJavaApiTest {
                 .get("/jsontext/mapping2")
         .then()
                 .statusCode(200)
-                .header("Content-Type", "application/json")
                 .body(CoreMatchers.equalTo(mock2RequestBody))
-                //.log().all(true)
-                ;
-
-        // Pause
-/*        try {
-            TimeUnit.SECONDS.sleep(30);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+                .header("Content-Type", "application/json");
     }
 
     @Test
-    public void testEndPoint3() {
-        // TODO: ...
+    public void testEndPoint3_RightBodyHeader() {
+        given()
+                .header("CustomType","CustomValue")
+                .body("TestValue1")
+        .when()
+                .post("/jsontext/mapping3")
+        .then()
+                .statusCode(500)
+                .header("Content-Type", "text/plain")
+                .body(CoreMatchers.equalTo(randomString2));
     }
 
-    @AfterMethod
+    @Test
+    public void testEndPoint3_WrongBodyNotContainedValue() {
+        given()
+                .header("CustomType","CustomValue")
+                .body("TestValue31")
+        .when()
+                .post("/jsontext/mapping3")
+        .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void testEndPoint3_WrongHeaderAbsent() {
+        given()
+                .body("TestValue1")
+        .when()
+                .post("/jsontext/mapping3")
+        .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void testEndPoint3_WrongHeaderIncorrectValue() {
+        given()
+                .header("CustomType","CustomValueChanged")
+                .body("TestValue1")
+        .when()
+                .post("/jsontext/mapping3")
+        .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void testEndPoint4() {
+        given()
+                .config(RestAssured.config()
+                        .redirect(redirectConfig().followRedirects(false)))
+        .when()
+                .put("/")
+        .then()
+                .statusCode(303)
+                .header("Location", "/plaintext/mapping1")
+                .time(greaterThanOrEqualTo((long) mock4ResponseDelaySeconds), TimeUnit.SECONDS);
+    }
+
+    @AfterClass
     public void tearDownPrintEvents() {
         List<ServeEvent> allServeEvents = getAllServeEvents();
         for (ServeEvent event : allServeEvents) {
@@ -139,8 +189,13 @@ public class MockRestEndpointWithJavaApiTest {
         }
     }
 
-    @AfterClass
+    @AfterTest
     public void tearDownWireMockServer() {
+        List<StubMapping> stubMappings = mock.getStubMappings();
+        stubMappings.forEach(stub -> {
+            log.debug("DELETE \n" + stub);
+            removeStub(stub);
+        });
         mock.stop();
     }
 }
