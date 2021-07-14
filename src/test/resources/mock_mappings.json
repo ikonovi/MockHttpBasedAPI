@@ -8,14 +8,14 @@
       },
       "response": {
         "status": 200,
-        "body": "SozuJIoVgKgL5XEX5KCfd1qTHCbgpMKFXZbN3VPrn1swDXPLQIc4kY5ywo3Ym91oEK5ZsFdMsZIcBmh8l4nG90eFojyS7UssfHP6",
+        "body": "replace on random string",
         "headers": {
-          "Content-Type": "text/plain",
-          "MyHeader": "myHeader"
+          "Content-Type": "text/plain"
         }
       },
       "uuid": "09009aad-bc6e-46b3-ad9f-58f90919e2df"
     },
+
     {
       "id": "9e5cf2cc-a956-4f3f-b67f-01cee6c22d9d",
       "request": {
@@ -36,6 +36,7 @@
       },
       "uuid": "9e5cf2cc-a956-4f3f-b67f-01cee6c22d9d"
     },
+
     {
       "id": "84ce039f-1185-4999-bd47-4496bb5a7a92",
       "request": {
@@ -54,7 +55,7 @@
       },
       "response": {
         "status": 500,
-        "body": "uprHJp7VlqcO5N8s5bm6",
+        "body": "replace on random string",
         "headers": {
           "Content-Type": "text/plain"
         }
@@ -62,6 +63,7 @@
       "uuid": "84ce039f-1185-4999-bd47-4496bb5a7a92",
       "priority": 10
     },
+
     {
       "id": "1cbc71f2-990f-43ac-b9a4-0daff6062d5f",
       "request": {
@@ -74,6 +76,7 @@
       "uuid": "1cbc71f2-990f-43ac-b9a4-0daff6062d5f",
       "priority": 20
     },
+
     {
       "id": "9da61f0b-951e-4ea5-8ddc-d0f7ed47040d",
       "request": {
@@ -89,6 +92,7 @@
       },
       "uuid": "9da61f0b-951e-4ea5-8ddc-d0f7ed47040d"
     }
+
   ],
   "meta": {
     "total": 5

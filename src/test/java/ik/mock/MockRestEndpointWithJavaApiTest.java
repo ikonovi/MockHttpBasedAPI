@@ -1,53 +1,46 @@
-package ik;
+package ik.mock;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import ik.util.random.RandomGenerator;
-import io.restassured.RestAssured;
 import lombok.extern.log4j.Log4j2;
-import org.hamcrest.CoreMatchers;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.testng.annotations.*;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.restassured.RestAssured.*;
 import static io.restassured.config.RedirectConfig.redirectConfig;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.apache.http.HttpHeaders.LOCATION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 @Log4j2
-public class MockRestEndpointWithJavaApiTest {
-    private WireMockServer mock;
+public class MockRestEndpointWithJavaApiTest extends TestBase {
     // Test data
     private final RandomGenerator randomGenerator = new RandomGenerator();
-    private String randomString1;
-    private String randomString2;
-    private final String mock2RequestBody = "{ a: 'a', b: 'b' }";
-    private int mock4ResponseDelaySeconds;
-
-    @BeforeTest
-    public void setupWireMockServer() {
-        WireMockConfiguration wireMockConfiguration = new WireMockConfiguration();
-        mock = new WireMockServer(wireMockConfiguration);
-        mock.start();
-    }
+    private String mock1RandomString;
+    private String mock2RandomString;
+    private final String mock2RequestBody = "{ a: \"a\", b: \"b\" }";
+    private long mock4ResponseDelaySeconds;
 
     @BeforeClass
     public void setupMock1() {
-        randomString1 = randomGenerator.randomAlphanumeric(100);
+        mock1RandomString = randomGenerator.randomAlphanumeric(100);
         mock.stubFor(
             get("/plaintext/mapping1")
                 .willReturn(aResponse()
                     .withStatus(200)
-                    .withBody(randomString1)
+                    .withBody(mock1RandomString)
                     .withHeader("Content-Type", "text/plain")
-                    .withHeader("MyHeader", "myHeader")
                 )
         );
     }
@@ -68,7 +61,7 @@ public class MockRestEndpointWithJavaApiTest {
 
     @BeforeClass
     public void setupMock3() {
-        randomString2 = randomGenerator.randomAlphanumeric(20);
+        mock2RandomString = randomGenerator.randomAlphanumeric(20);
         mock.stubFor(
             post("/jsontext/mapping3")
                 .atPriority(10)
@@ -77,7 +70,7 @@ public class MockRestEndpointWithJavaApiTest {
             .willReturn(serverError()
                 .withStatus(500)
                 .withHeader("Content-Type", "text/plain")
-                .withBody(randomString2)
+                .withBody(mock2RandomString)
             )
         );
         mock.stubFor(
@@ -91,7 +84,7 @@ public class MockRestEndpointWithJavaApiTest {
 
     @BeforeClass
     public void setupMock4() {
-        mock4ResponseDelaySeconds = 10;
+        mock4ResponseDelaySeconds = 10L;
         mock.stubFor(
             put(urlPathMatching("/*"))
                 .willReturn(
@@ -109,8 +102,8 @@ public class MockRestEndpointWithJavaApiTest {
         .then()
             .statusCode(200)
         .assertThat()
-            .body(equalTo(randomString1))
-            .header("Content-Type", "text/plain");
+            .body(equalTo(mock1RandomString))
+            .header(CONTENT_TYPE, "text/plain");
     }
 
     @Test
@@ -123,7 +116,7 @@ public class MockRestEndpointWithJavaApiTest {
             .statusCode(200)
         .assertThat()
             .body(equalTo(mock2RequestBody))
-            .header("Content-Type", "application/json");
+            .header(CONTENT_TYPE, "application/json");
     }
 
     @Test
@@ -136,8 +129,8 @@ public class MockRestEndpointWithJavaApiTest {
         .then()
                 .statusCode(500)
         .assertThat()
-                .header("Content-Type", "text/plain")
-                .body(equalTo(randomString2));
+                .header(CONTENT_TYPE, "text/plain")
+                .body(equalTo(mock2RandomString));
     }
 
     @Test
@@ -182,11 +175,11 @@ public class MockRestEndpointWithJavaApiTest {
         .then()
                 .statusCode(303)
         .assertThat()
-                .header("Location", "/plaintext/mapping1")
-                .time(greaterThanOrEqualTo((long) mock4ResponseDelaySeconds), TimeUnit.SECONDS);
+                .header(LOCATION, "/plaintext/mapping1")
+                .time(greaterThanOrEqualTo(mock4ResponseDelaySeconds), TimeUnit.SECONDS);
     }
 
-    @AfterClass
+    //@AfterClass
     public void tearDownPrintEvents() {
         List<ServeEvent> allServeEvents = getAllServeEvents();
         for (ServeEvent event : allServeEvents) {
@@ -194,13 +187,11 @@ public class MockRestEndpointWithJavaApiTest {
         }
     }
 
-    @AfterTest
-    public void tearDownWireMockServer() {
+    @AfterClass
+    public void printStubs() {
         List<StubMapping> stubMappings = mock.getStubMappings();
         stubMappings.forEach(stub -> {
-            log.debug("DELETE \n" + stub);
-            removeStub(stub);
+            log.debug("STUB:\n{}\n", stub);
         });
-        mock.stop();
     }
 }
