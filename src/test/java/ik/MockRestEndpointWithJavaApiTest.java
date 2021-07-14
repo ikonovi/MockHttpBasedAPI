@@ -1,6 +1,7 @@
 package ik;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
@@ -15,9 +16,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
+import static io.restassured.RestAssured.*;
 import static io.restassured.config.RedirectConfig.redirectConfig;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 @Log4j2
@@ -56,7 +57,7 @@ public class MockRestEndpointWithJavaApiTest {
         // Mock #2
         mock.stubFor(
             get(urlPathMatching("/jsontext/mapping2*"))
-                .withQueryParam("testqueryparam", equalTo("*"))
+                .withQueryParam("testqueryparam", WireMock.equalTo("*"))
                 .willReturn(aResponse()
                     .withStatus(200)
                     .withBody(mock2RequestBody)
@@ -71,7 +72,7 @@ public class MockRestEndpointWithJavaApiTest {
         mock.stubFor(
             post("/jsontext/mapping3")
                 .atPriority(10)
-                .withHeader("CustomType", equalTo("CustomValue"))
+                .withHeader("CustomType", WireMock.equalTo("CustomValue"))
                 .withRequestBody(containing("TestValue1"))
             .willReturn(serverError()
                 .withStatus(500)
@@ -107,20 +108,22 @@ public class MockRestEndpointWithJavaApiTest {
             .get("/plaintext/mapping1")
         .then()
             .statusCode(200)
-            .body(CoreMatchers.equalTo(randomString1))
+        .assertThat()
+            .body(equalTo(randomString1))
             .header("Content-Type", "text/plain");
     }
 
     @Test
     public void testEndPoint2() {
         given()
-                .queryParam("testqueryparam", "*")
+            .queryParam("testqueryparam", "*")
         .when()
-                .get("/jsontext/mapping2")
+            .get("/jsontext/mapping2")
         .then()
-                .statusCode(200)
-                .body(CoreMatchers.equalTo(mock2RequestBody))
-                .header("Content-Type", "application/json");
+            .statusCode(200)
+        .assertThat()
+            .body(equalTo(mock2RequestBody))
+            .header("Content-Type", "application/json");
     }
 
     @Test
@@ -132,8 +135,9 @@ public class MockRestEndpointWithJavaApiTest {
                 .post("/jsontext/mapping3")
         .then()
                 .statusCode(500)
+        .assertThat()
                 .header("Content-Type", "text/plain")
-                .body(CoreMatchers.equalTo(randomString2));
+                .body(equalTo(randomString2));
     }
 
     @Test
@@ -171,12 +175,13 @@ public class MockRestEndpointWithJavaApiTest {
     @Test
     public void testEndPoint4() {
         given()
-                .config(RestAssured.config()
+                .config(config()
                         .redirect(redirectConfig().followRedirects(false)))
         .when()
                 .put("/")
         .then()
                 .statusCode(303)
+        .assertThat()
                 .header("Location", "/plaintext/mapping1")
                 .time(greaterThanOrEqualTo((long) mock4ResponseDelaySeconds), TimeUnit.SECONDS);
     }
