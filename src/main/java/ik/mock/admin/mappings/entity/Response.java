@@ -10,6 +10,7 @@ import java.util.Map;
 @Setter(AccessLevel.NONE)
 public class Response {
     private Integer status;
+    @Setter
     private String body;
     private Map<String, Object> headers; // key value can be type of String or List<String>.
     private Integer fixedDelayMilliseconds;
