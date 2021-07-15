@@ -1,0 +1,13 @@
+{
+  "httpClientProps": {
+    "connectionRequestTimeoutMillis": 30000,
+    "connectTimeoutMillis": 15000
+  },
+  "mockProps": {
+    "adminEndpointProtocol": "http",
+    "adminEndpointHost": "localhost",
+    "adminEndpointPort": 8080,
+    "createStubMappingPath": "/__admin/mappings",
+    "mappingJsonPath": "./mock_mappings.json"
+  }
+}

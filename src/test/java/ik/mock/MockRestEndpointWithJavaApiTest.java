@@ -27,19 +27,19 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 public class MockRestEndpointWithJavaApiTest extends TestBase {
     // Test data
     private final RandomGenerator randomGenerator = new RandomGenerator();
-    private String mock1RandomString;
-    private String mock2RandomString;
-    private final String mock2RequestBody = "{ a: \"a\", b: \"b\" }";
+    private String mock1ResponseBody;
+    private String mock2ResponseBody = "{ a: \"a\", b: \"b\" }";
+    private String mock3ResponseBody;
     private long mock4ResponseDelaySeconds;
 
     @BeforeClass
     public void setupMock1() {
-        mock1RandomString = randomGenerator.randomAlphanumeric(100);
+        mock1ResponseBody = randomGenerator.randomAlphanumeric(100);
         mock.stubFor(
             get("/plaintext/mapping1")
                 .willReturn(aResponse()
                     .withStatus(200)
-                    .withBody(mock1RandomString)
+                    .withBody(mock1ResponseBody)
                     .withHeader("Content-Type", "text/plain")
                 )
         );
@@ -53,7 +53,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
                 .withQueryParam("testqueryparam", WireMock.equalTo("*"))
                 .willReturn(aResponse()
                     .withStatus(200)
-                    .withBody(mock2RequestBody)
+                    .withBody(mock2ResponseBody)
                     .withHeader("Content-Type", "application/json")
                 )
         );
@@ -61,7 +61,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
 
     @BeforeClass
     public void setupMock3() {
-        mock2RandomString = randomGenerator.randomAlphanumeric(20);
+        mock3ResponseBody = randomGenerator.randomAlphanumeric(20);
         mock.stubFor(
             post("/jsontext/mapping3")
                 .atPriority(10)
@@ -70,7 +70,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
             .willReturn(serverError()
                 .withStatus(500)
                 .withHeader("Content-Type", "text/plain")
-                .withBody(mock2RandomString)
+                .withBody(mock3ResponseBody)
             )
         );
         mock.stubFor(
@@ -102,7 +102,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
         .then()
             .statusCode(200)
         .assertThat()
-            .body(equalTo(mock1RandomString))
+            .body(equalTo(mock1ResponseBody))
             .header(CONTENT_TYPE, "text/plain");
     }
 
@@ -115,7 +115,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
         .then()
             .statusCode(200)
         .assertThat()
-            .body(equalTo(mock2RequestBody))
+            .body(equalTo(mock2ResponseBody))
             .header(CONTENT_TYPE, "application/json");
     }
 
@@ -130,7 +130,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
                 .statusCode(500)
         .assertThat()
                 .header(CONTENT_TYPE, "text/plain")
-                .body(equalTo(mock2RandomString));
+                .body(equalTo(mock3ResponseBody));
     }
 
     @Test
