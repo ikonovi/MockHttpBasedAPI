@@ -134,7 +134,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
     }
 
     @Test
-    public void testEndPoint3_WrongBodyNotContainedValue() {
+    public void testEndPoint3_BodyNotContainedValue() {
         given()
                 .header("CustomType","CustomValue")
                 .body("TestValue31")
@@ -145,7 +145,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
     }
 
     @Test
-    public void testEndPoint3_WrongHeaderAbsent() {
+    public void testEndPoint3_HeaderAbsent() {
         given()
                 .body("TestValue1")
         .when()
@@ -155,7 +155,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
     }
 
     @Test
-    public void testEndPoint3_WrongHeaderIncorrectValue() {
+    public void testEndPoint3_HeaderIncorrectValue() {
         given()
                 .header("CustomType","CustomValueChanged")
                 .body("TestValue1")

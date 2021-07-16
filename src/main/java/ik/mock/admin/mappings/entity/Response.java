@@ -13,5 +13,5 @@ public class Response {
     @Setter
     private String body;
     private Map<String, Object> headers; // key value can be type of String or List<String>.
-    private Integer fixedDelayMilliseconds;
+    private Long fixedDelayMilliseconds;
 }

@@ -9,7 +9,7 @@
       },
       "response": {
         "status": 200,
-        "body": "replace on random string",
+        "body": "<random string of 100 symbols>",
         "headers": {
           "Content-Type": "text/plain"
         }
@@ -31,7 +31,7 @@
       },
       "response": {
         "status": 200,
-        "body": "{ a: 'a', b: 'b' }",
+        "body": "<Json-file with test configuration>",
         "headers": {
           "Content-Type": "application/json"
         }
@@ -58,7 +58,7 @@
       },
       "response": {
         "status": 500,
-        "body": "replace on random string",
+        "body": "<random string of 20 symbols>",
         "headers": {
           "Content-Type": "text/plain"
         }
@@ -83,7 +83,7 @@
 
     {
       "id": "9da61f0b-951e-4ea5-8ddc-d0f7ed47040d",
-      "name": "Mapping4 - Redirect to Mapping1",
+      "name": "Redirect to Mapping1",
       "request": {
         "urlPathPattern": "/*",
         "method": "PUT"
