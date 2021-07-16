@@ -17,9 +17,9 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 @Log4j2
 public class MockRestEndpointWithRestApiTest extends TestBase {
+    MappingService mappingService = new MappingService();
     ExpectedMappings expectedMappings;
     String endPoint3RequestBodyContainsText;
-    MappingService mappingService = new MappingService();
 
     @BeforeClass
     public void setupMocks() {
@@ -38,6 +38,11 @@ public class MockRestEndpointWithRestApiTest extends TestBase {
         } catch (MappingHttpServiceException exception) {
             Assert.fail("Failed to delete mock mappings", exception);
         }
+    }
+
+    @AfterClass
+    public void printRequestsAndResponsesInConsole(){
+        this.mappingService.printAllRequests();
     }
 
     @Test

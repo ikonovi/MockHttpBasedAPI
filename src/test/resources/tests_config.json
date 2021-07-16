@@ -8,6 +8,7 @@
     "adminEndpointHost": "localhost",
     "adminEndpointPort": 8080,
     "endPointAdminMappingsPath": "/__admin/mappings",
+    "endPointAdminRequestsPath": "/__admin/requests",
     "mappingJsonPath": "./mock_mappings.json"
   }
 }

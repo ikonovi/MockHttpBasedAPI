@@ -11,5 +11,6 @@ public class MockProps {
     String adminEndpointHost;
     Integer adminEndpointPort;
     String endPointAdminMappingsPath;
+    String endPointAdminRequestsPath;
     String mappingJsonPath;
 }

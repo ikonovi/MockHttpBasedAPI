@@ -12,11 +12,13 @@ import ik.mock.exceptions.MappingHttpServiceException;
 import ik.mock.exceptions.TestsExecutionException;
 import ik.resources.JsonResource;
 import ik.util.random.RandomGenerator;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Log4j2
 public class MappingService {
     private final RandomGenerator randomGenerator;
     private final Gson gson;
@@ -73,6 +75,22 @@ public class MappingService {
 
     public void deleteAllStubMappings() throws MappingHttpServiceException {
         this.mappingHttpService.deleteAllStubMappings();
+    }
+
+    public void printAllRequests(){
+        try {
+            String requestsJson = mappingHttpService.getAllRequestsInJournal();
+            log.info( "================================================================"
+                    + "All Requests and Responses:"
+            + "================================================================");
+            printInLogs(requestsJson);
+        } catch (MappingHttpServiceException exception) {
+            log.error("Could not print requests", exception);
+        }
+    }
+
+    private void printInLogs(String json) {
+        log.info("{}", json);
     }
 
     private static Mapping find(String mappingName, List<Mapping> mappings) throws TestsExecutionException {

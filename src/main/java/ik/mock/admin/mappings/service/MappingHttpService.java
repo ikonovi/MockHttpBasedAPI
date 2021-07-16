@@ -9,6 +9,7 @@ import ik.mock.exceptions.MappingHttpServiceException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -24,6 +25,7 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 public class MappingHttpService {
     private final String endPointContextUrl;
     private final String endPointAdminMappingsPath;
+    private final String endPointAdminRequestsPath;
     CloseableHttpClient httpClient;
 
     public MappingHttpService() {
@@ -31,6 +33,7 @@ public class MappingHttpService {
         this.endPointContextUrl = mockProps.getAdminEndpointProtocol() + "://" +
                 mockProps.getAdminEndpointHost() + ":" + mockProps.getAdminEndpointPort();
         this.endPointAdminMappingsPath = mockProps.getEndPointAdminMappingsPath();
+        this.endPointAdminRequestsPath = mockProps.getEndPointAdminRequestsPath();
         this.httpClient = CloseableHttpClientFactory.getInstance().createHttpClient();
     }
 
@@ -48,6 +51,20 @@ public class MappingHttpService {
             return mapping;
         } catch (IOException e) {
             throw new MappingHttpServiceException("Could not create mapping with json \n" + mappingJson, e);
+        }
+    }
+
+    public String getAllRequestsInJournal() throws MappingHttpServiceException {
+        HttpGet httpGet = new HttpGet(endPointContextUrl + endPointAdminRequestsPath);
+        try(CloseableHttpResponse response = httpClient.execute(httpGet)) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != 200) {
+                throw new MappingHttpServiceException("Status code is not 200: " + statusCode);
+            }
+            log.debug("Get all requests in journal");
+            return EntityUtils.toString(response.getEntity());
+        } catch (IOException exception) {
+            throw new MappingHttpServiceException("Could not get requests in journal", exception);
         }
     }
 

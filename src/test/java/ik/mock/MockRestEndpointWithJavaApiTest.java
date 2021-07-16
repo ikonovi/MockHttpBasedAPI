@@ -28,7 +28,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
     // Test data
     private final RandomGenerator randomGenerator = new RandomGenerator();
     private String mock1ResponseBody;
-    private String mock2ResponseBody = "{ a: \"a\", b: \"b\" }";
+    private final String mock2ResponseBody = "{ a: \"a\", b: \"b\" }";
     private String mock3ResponseBody;
     private long mock4ResponseDelaySeconds;
 
@@ -179,7 +179,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
                 .time(greaterThanOrEqualTo(mock4ResponseDelaySeconds), TimeUnit.SECONDS);
     }
 
-    //@AfterClass
+    @AfterClass
     public void tearDownPrintEvents() {
         List<ServeEvent> allServeEvents = getAllServeEvents();
         for (ServeEvent event : allServeEvents) {
@@ -190,8 +190,6 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
     @AfterClass
     public void printStubs() {
         List<StubMapping> stubMappings = mock.getStubMappings();
-        stubMappings.forEach(stub -> {
-            log.debug("STUB:\n{}\n", stub);
-        });
+        stubMappings.forEach(stub -> log.debug("STUB:\n{}\n", stub));
     }
 }
