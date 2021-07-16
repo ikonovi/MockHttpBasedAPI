@@ -2,6 +2,7 @@
   "mappings": [
     {
       "id": "09009aad-bc6e-46b3-ad9f-58f90919e2df",
+      "name": "Mapping1",
       "request": {
         "url": "/plaintext/mapping1",
         "method": "GET"
@@ -18,6 +19,7 @@
 
     {
       "id": "9e5cf2cc-a956-4f3f-b67f-01cee6c22d9d",
+      "name": "Mapping2",
       "request": {
         "urlPathPattern": "/jsontext/mapping2*",
         "method": "GET",
@@ -39,6 +41,7 @@
 
     {
       "id": "84ce039f-1185-4999-bd47-4496bb5a7a92",
+      "name": "Mapping3 - Server Error 500",
       "request": {
         "url": "/jsontext/mapping3",
         "method": "POST",
@@ -66,6 +69,7 @@
 
     {
       "id": "1cbc71f2-990f-43ac-b9a4-0daff6062d5f",
+      "name": "Mapping3 - Not Found 404",
       "request": {
         "url": "/jsontext/mapping3",
         "method": "POST"
@@ -79,6 +83,7 @@
 
     {
       "id": "9da61f0b-951e-4ea5-8ddc-d0f7ed47040d",
+      "name": "Mapping4 - Redirect to Mapping1",
       "request": {
         "urlPathPattern": "/*",
         "method": "PUT"

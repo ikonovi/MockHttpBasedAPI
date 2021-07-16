@@ -2,15 +2,18 @@ package ik.mock;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import ik.mock.admin.mappings.StubMappings;
-import ik.mock.admin.mappings.entity.AllStubMappings;
+import ik.mock.admin.mappings.service.MappingHttpService;
+import ik.mock.admin.mappings.service.MappingService;
+import ik.mock.admin.mappings.entity.AllMappings;
 import ik.mock.admin.mappings.entity.Mapping;
 import ik.mock.config.TestsConfigReader;
+import ik.mock.exceptions.JsonResourceDeserializationException;
 import ik.mock.exceptions.TestsExecutionException;
 import ik.resources.JsonResource;
 import ik.util.random.RandomGenerator;
 import lombok.extern.log4j.Log4j2;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -21,27 +24,41 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 @Log4j2
 public class MockRestEndpointWithRestApiTest extends TestBase {
-    private final RandomGenerator randomGenerator = new RandomGenerator();
-    private Mapping stubMapping1;
+    List<Mapping> deserializedMappings;
+    Mapping mapping1;
+    Mapping mapping2;
+    Mapping mapping3;
+    Mapping mapping4;
+    MappingHttpService mappingHttpService;
+    MappingService mappingService;
+    RandomGenerator randomGenerator;
+    Gson gson;
 
     @BeforeTest
-    public void setupMock1() {
-        // read
-        JsonResource<AllStubMappings> jsonResource = new JsonResource<>();
-        String jsonPath = TestsConfigReader.getTestsConfig().getMockProps().getMappingJsonPath();
+    public void setupDeserializeMappings() {
+        String mappingJsonPath = TestsConfigReader.getTestsConfig().getMockProps().getMappingJsonPath();
+        JsonResource<AllMappings> jsonResource = new JsonResource<>();
         try {
-            List<Mapping> mappings = jsonResource.deserialize(jsonPath, AllStubMappings.class).getMappings();
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            Mapping mapping1 = mappings.get(0);
-            // update
-            String mock1ResponseBody = randomGenerator.randomAlphanumeric(100);
-            mapping1.getResponse().setBody(mock1ResponseBody);
-            String mapping1json = gson.toJson(mapping1);
-            // init
-            StubMappings stubMappings = new StubMappings();
-            stubMapping1 = stubMappings.createStubMapping(mapping1json);
-        } catch (TestsExecutionException e) {
-            Assert.fail("Failed mock setup", e);
+            this.deserializedMappings = jsonResource.deserialize(mappingJsonPath, AllMappings.class).getMappings();
+        } catch (JsonResourceDeserializationException exception) {
+            Assert.fail("Failed reading mapping configuration", exception);
+        }
+        this.randomGenerator = new RandomGenerator();
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.mappingHttpService = new MappingHttpService();
+        this.mappingService = new MappingService();
+    }
+
+    @BeforeClass
+    public void setupMock1() {
+        String mappingName = "Mapping1";
+        try {
+            mapping1 = MappingService.find(mappingName, deserializedMappings);
+            mappingService.customizeMapping1(mapping1);
+            String mapping1Json = gson.toJson(mapping1);
+            mapping1 = mappingHttpService.createStubMapping(mapping1Json);
+        } catch (TestsExecutionException ex) {
+            Assert.fail("Failed mock1 setup", ex);
         }
     }
 
@@ -49,11 +66,11 @@ public class MockRestEndpointWithRestApiTest extends TestBase {
     @Test
     public void testEndPoint1() {
         when()
-                .get(stubMapping1.getRequest().getUrl())
+                .get(mapping1.getRequest().getUrl())
         .then()
                 .statusCode(200)
         .assertThat()
-                .body(equalTo(stubMapping1.getResponse().getBody()))
-                .headers(stubMapping1.getResponse().getHeaders());
+                .body(equalTo(mapping1.getResponse().getBody()))
+                .headers(mapping1.getResponse().getHeaders());
     }
 }

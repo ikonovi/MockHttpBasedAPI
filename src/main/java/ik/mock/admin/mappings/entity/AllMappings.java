@@ -8,6 +8,6 @@ import java.util.List;
 
 @Data
 @Setter(AccessLevel.NONE)
-public class AllStubMappings {
+public class AllMappings {
     private List<Mapping> mappings;
 }

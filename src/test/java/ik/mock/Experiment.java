@@ -2,21 +2,21 @@ package ik.mock;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import ik.mock.exceptions.JsonResourceDeserializationExceptionNot;
+import ik.mock.exceptions.JsonResourceDeserializationException;
 import ik.resources.JsonResource;
-import ik.mock.admin.mappings.entity.AllStubMappings;
+import ik.mock.admin.mappings.entity.AllMappings;
 import ik.mock.admin.mappings.entity.Mapping;
 
 public class Experiment {
 
-    public static void main(String[] args) throws JsonResourceDeserializationExceptionNot {
+    public static void main(String[] args) throws JsonResourceDeserializationException {
 
         String jsonPath = "./mock_mappings.json";
-        JsonResource<AllStubMappings> jsonResource = new JsonResource<>();
-        AllStubMappings allStubMappings = jsonResource.deserialize(jsonPath, AllStubMappings.class);
+        JsonResource<AllMappings> jsonResource = new JsonResource<>();
+        AllMappings allMappings = jsonResource.deserialize(jsonPath, AllMappings.class);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        for (Mapping mapping : allStubMappings.getMappings()){
+        for (Mapping mapping : allMappings.getMappings()){
             System.out.println(mapping + "\n" + gson.toJson(mapping));
         }
 

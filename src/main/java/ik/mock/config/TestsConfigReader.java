@@ -1,7 +1,7 @@
 package ik.mock.config;
 
 import ik.mock.config.entity.TestsConfigProps;
-import ik.mock.exceptions.JsonResourceDeserializationExceptionNot;
+import ik.mock.exceptions.JsonResourceDeserializationException;
 import ik.resources.JsonResource;
 import lombok.extern.log4j.Log4j2;
 
@@ -15,7 +15,7 @@ public class TestsConfigReader {
         String jsonPath = "./tests_config.json";
         try {
             properties = jsonResource.deserialize(jsonPath, TestsConfigProps.class);
-        } catch (JsonResourceDeserializationExceptionNot ex) {
+        } catch (JsonResourceDeserializationException ex) {
             log.error("Failed reading test configuration from file \"" + jsonPath + "\"", ex);
         }
     }

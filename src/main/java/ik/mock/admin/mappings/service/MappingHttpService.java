@@ -1,11 +1,11 @@
-package ik.mock.admin.mappings;
+package ik.mock.admin.mappings.service;
 
 import com.google.gson.Gson;
 import ik.mock.admin.client.CloseableHttpClientFactory;
 import ik.mock.admin.mappings.entity.Mapping;
 import ik.mock.config.TestsConfigReader;
 import ik.mock.config.entity.MockProps;
-import ik.mock.exceptions.StubMappingExceptionNot;
+import ik.mock.exceptions.MappingHttpServiceException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -20,19 +20,20 @@ import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 @Log4j2
-public class StubMappings {
+public class MappingHttpService {
     private final String mockEndpointUrl;
     private final String createStubMappingPath;
+    CloseableHttpClient httpClient;
 
-    public StubMappings() {
+    public MappingHttpService() {
         MockProps mockProps = TestsConfigReader.getTestsConfig().getMockProps();
         this.mockEndpointUrl = mockProps.getAdminEndpointProtocol() + "://" +
                 mockProps.getAdminEndpointHost() + ":" + mockProps.getAdminEndpointPort();
         this.createStubMappingPath = mockProps.getCreateStubMappingPath();
+        this.httpClient = CloseableHttpClientFactory.getInstance().createHttpClient();
     }
 
-    public Mapping createStubMapping(String mappingJson) throws StubMappingExceptionNot {
-        CloseableHttpClient httpClient = CloseableHttpClientFactory.getInstance().createHttpClient();
+    public Mapping createStubMapping(String mappingJson) throws MappingHttpServiceException {
         HttpPost httpPost = new HttpPost(mockEndpointUrl + createStubMappingPath);
         httpPost.setHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType());
         StringEntity stringEntity = new StringEntity(mappingJson, StandardCharsets.UTF_8);
@@ -45,7 +46,7 @@ public class StubMappings {
             log.debug("{}", mapping);
             return mapping;
         } catch (IOException e) {
-            throw new StubMappingExceptionNot("Could not create mapping with json \n" + mappingJson, e);
+            throw new MappingHttpServiceException("Could not create mapping with json \n" + mappingJson, e);
         }
     }
 
