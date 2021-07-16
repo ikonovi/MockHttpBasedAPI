@@ -2,7 +2,7 @@ package ik.mock.admin.mappings.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import ik.mock.admin.mappings.ExpectedMappings;
+import ik.mock.admin.mappings.testing.ExpectedMappings;
 import ik.mock.admin.mappings.entity.AllMappings;
 import ik.mock.admin.mappings.entity.Mapping;
 import ik.mock.config.TestsConfigReader;

@@ -1,6 +1,6 @@
 package ik.mock;
 
-import ik.mock.admin.mappings.ExpectedMappings;
+import ik.mock.admin.mappings.testing.ExpectedMappings;
 import ik.mock.admin.mappings.service.MappingService;
 import ik.mock.exceptions.MappingHttpServiceException;
 import ik.mock.exceptions.TestsExecutionException;

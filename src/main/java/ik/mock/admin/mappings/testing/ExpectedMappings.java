@@ -1,4 +1,4 @@
-package ik.mock.admin.mappings;
+package ik.mock.admin.mappings.testing;
 
 import ik.mock.admin.mappings.entity.Mapping;
 import lombok.Data;
