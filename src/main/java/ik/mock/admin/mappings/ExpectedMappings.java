@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Data
 public class ExpectedMappings {
-    Mapping mapping1;
-    Mapping mapping2;
-    Mapping mapping3Se500;
-    Mapping mapping3Nf404;
-    Mapping redirectToMapping1;
+    private Mapping mapping1;
+    private Mapping mapping2;
+    private Mapping mapping3Se500;
+    private Mapping mapping3Nf404;
+    private Mapping redirectToMapping1;
 }

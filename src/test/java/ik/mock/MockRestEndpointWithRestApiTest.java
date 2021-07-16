@@ -1,57 +1,42 @@
 package ik.mock;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import ik.mock.admin.mappings.ExpectedMappings;
-import ik.mock.admin.mappings.service.MappingHttpService;
 import ik.mock.admin.mappings.service.MappingService;
-import ik.mock.admin.mappings.entity.AllMappings;
-import ik.mock.admin.mappings.entity.Mapping;
-import ik.mock.config.TestsConfigReader;
-import ik.mock.exceptions.JsonResourceDeserializationException;
+import ik.mock.exceptions.MappingHttpServiceException;
 import ik.mock.exceptions.TestsExecutionException;
-import ik.resources.JsonResource;
 import lombok.extern.log4j.Log4j2;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.*;
 import static io.restassured.config.RedirectConfig.redirectConfig;
-import static org.apache.http.HttpHeaders.LOCATION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 @Log4j2
 public class MockRestEndpointWithRestApiTest extends TestBase {
-    MappingService mappingService;
-    List<Mapping> deserializedMappings;
     ExpectedMappings expectedMappings;
     String endPoint3RequestBodyContainsText;
-
-    @BeforeTest
-    public void setupDeserializeMappings() {
-        String mappingJsonPath = TestsConfigReader.getTestsConfig().getMockProps().getMappingJsonPath();
-        JsonResource<AllMappings> jsonResource = new JsonResource<>();
-        try {
-            this.deserializedMappings = jsonResource.deserialize(mappingJsonPath, AllMappings.class).getMappings();
-        } catch (JsonResourceDeserializationException exception) {
-            Assert.fail("Failed reading mapping configuration", exception);
-        }
-        this.mappingService = new MappingService();
-    }
+    MappingService mappingService = new MappingService();
 
     @BeforeClass
     public void setupMocks() {
         try {
-            expectedMappings = mappingService.customizeAndCreateMappings(deserializedMappings);
+            expectedMappings = mappingService.customizeAndCreateMappings();
             endPoint3RequestBodyContainsText = expectedMappings.getMapping3Se500().getRequest().getBodyPatterns().get(0).get("contains");
         } catch (TestsExecutionException ex) {
-            Assert.fail("Failed mock1 setup", ex);
+            Assert.fail("Failed mock setup", ex);
+        }
+    }
+
+    @AfterClass
+    public void tearDownDeleteAllStubMappings() {
+        try {
+            this.mappingService.deleteAllStubMappings();
+        } catch (MappingHttpServiceException exception) {
+            Assert.fail("Failed to delete mock mappings", exception);
         }
     }
 

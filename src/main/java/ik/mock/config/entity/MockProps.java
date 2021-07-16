@@ -10,6 +10,6 @@ public class MockProps {
     String adminEndpointProtocol;
     String adminEndpointHost;
     Integer adminEndpointPort;
-    String createStubMappingPath;
+    String endPointAdminMappingsPath;
     String mappingJsonPath;
 }

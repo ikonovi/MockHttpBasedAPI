@@ -7,7 +7,7 @@
     "adminEndpointProtocol": "http",
     "adminEndpointHost": "localhost",
     "adminEndpointPort": 8080,
-    "createStubMappingPath": "/__admin/mappings",
+    "endPointAdminMappingsPath": "/__admin/mappings",
     "mappingJsonPath": "./mock_mappings.json"
   }
 }
