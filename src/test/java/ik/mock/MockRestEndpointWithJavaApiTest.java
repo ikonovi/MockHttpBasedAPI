@@ -1,13 +1,14 @@
 package ik.mock;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import ik.util.random.RandomGenerator;
+import io.restassured.RestAssured;
 import lombok.extern.log4j.Log4j2;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,18 +25,35 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 @Log4j2
-public class MockRestEndpointWithJavaApiTest extends TestBase {
+public class MockRestEndpointWithJavaApiTest {
+    protected WireMockServer mockServer;
+
     // Test data
     private final RandomGenerator randomGenerator = new RandomGenerator();
     private String mock1ResponseBody;
     private final String mock2ResponseBody = "{ a: \"a\", b: \"b\" }";
     private String mock3ResponseBody;
     private long mock4ResponseDelaySeconds;
+    private int mockServerPort;
+
+    @BeforeTest
+    public void setupMockServer() {
+        WireMockConfiguration mockServerConfig = new WireMockConfiguration();
+        mockServerConfig.port(8088);
+        mockServer = new WireMockServer(mockServerConfig);
+        mockServer.start();
+        mockServerPort = mockServerConfig.portNumber();
+    }
+
+    @BeforeClass
+    public void setupRestAssure() {
+        RestAssured.port = mockServerPort;
+    }
 
     @BeforeClass
     public void setupMock1() {
         mock1ResponseBody = randomGenerator.randomAlphanumeric(100);
-        mock.stubFor(
+        mockServer.stubFor(
             get("/plaintext/mapping1")
                 .willReturn(aResponse()
                     .withStatus(200)
@@ -48,7 +66,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
     @BeforeClass
     public void setupMock2() {
         // Mock #2
-        mock.stubFor(
+        mockServer.stubFor(
             get(urlPathMatching("/jsontext/mapping2*"))
                 .withQueryParam("testqueryparam", WireMock.equalTo("*"))
                 .willReturn(aResponse()
@@ -62,7 +80,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
     @BeforeClass
     public void setupMock3() {
         mock3ResponseBody = randomGenerator.randomAlphanumeric(20);
-        mock.stubFor(
+        mockServer.stubFor(
             post("/jsontext/mapping3")
                 .atPriority(10)
                 .withHeader("CustomType", WireMock.equalTo("CustomValue"))
@@ -73,7 +91,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
                 .withBody(mock3ResponseBody)
             )
         );
-        mock.stubFor(
+        mockServer.stubFor(
             post("/jsontext/mapping3")
                 .atPriority(20)
                 .willReturn(
@@ -85,7 +103,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
     @BeforeClass
     public void setupMock4() {
         mock4ResponseDelaySeconds = 10L;
-        mock.stubFor(
+        mockServer.stubFor(
             put(urlPathMatching("/*"))
                 .willReturn(
                         temporaryRedirect("/plaintext/mapping1")
@@ -181,7 +199,7 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
 
     @AfterClass
     public void tearDownPrintEvents() {
-        List<ServeEvent> allServeEvents = getAllServeEvents();
+        List<ServeEvent> allServeEvents = mockServer.getAllServeEvents();
         for (ServeEvent event : allServeEvents) {
             log.debug("\nRequest {}\n\nResponse {}", event.getRequest(), event.getResponseDefinition());
         }
@@ -189,7 +207,12 @@ public class MockRestEndpointWithJavaApiTest extends TestBase {
 
     @AfterClass
     public void printStubs() {
-        List<StubMapping> stubMappings = mock.getStubMappings();
+        List<StubMapping> stubMappings = mockServer.getStubMappings();
         stubMappings.forEach(stub -> log.debug("STUB:\n{}\n", stub));
+    }
+
+    @AfterTest
+    public void tearDownMockServer() {
+        mockServer.stop();
     }
 }
